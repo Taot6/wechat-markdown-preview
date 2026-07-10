@@ -66,20 +66,44 @@ select:hover {
 .app-shell {
   width: 100%;
   min-height: 100vh;
+  padding: 14px;
+}
+
+.template-panel {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: 14px;
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.template-selector {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+.template-selector label {
+  color: var(--muted);
+  font-size: 13px;
 }
 
 .workspace {
   display: grid;
   grid-template-columns: minmax(320px, 0.9fr) 300px minmax(390px, 1.1fr);
   gap: 14px;
-  min-height: 100vh;
-  padding: 14px;
+  min-height: calc(100vh - 122px);
 }
 
 .editor-panel,
 .control-panel,
 .preview-panel {
-  min-height: calc(100vh - 28px);
+  min-height: calc(100vh - 122px);
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -181,16 +205,16 @@ input[type="color"] {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 16px;
+  padding-bottom: 4px;
+  margin-bottom: 0;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
 }
 
 .template-card {
-  flex: 0 0 168px;
+  flex: 0 0 210px;
   justify-content: flex-start;
-  min-height: 54px;
+  min-height: 64px;
   padding: 10px;
   text-align: left;
   border-radius: 7px;
@@ -391,9 +415,16 @@ input[type="color"] {
 }
 
 @media (max-width: 760px) {
+  .app-shell {
+    padding: 8px;
+  }
+
+  .template-panel {
+    grid-template-columns: 1fr;
+  }
+
   .workspace {
     grid-template-columns: 1fr;
-    padding: 8px;
   }
 
   .editor-panel,

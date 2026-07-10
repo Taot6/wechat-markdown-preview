@@ -8,6 +8,15 @@
   </head>
   <body>
     <main class="app-shell">
+      <section class="template-panel" aria-label="模板选择区">
+        <div class="template-selector">
+          <label for="templateSelect">模板</label>
+          <select id="templateSelect"></select>
+        </div>
+
+        <div class="template-list" id="templateList" aria-label="模板列表"></div>
+      </section>
+
       <section class="workspace">
         <aside class="editor-panel" aria-label="Markdown 编辑区">
           <div class="panel-head">
@@ -35,13 +44,6 @@
         </aside>
 
         <section class="control-panel" aria-label="模板控制区">
-          <div class="control-group">
-            <label for="templateSelect">模板</label>
-            <select id="templateSelect"></select>
-          </div>
-
-          <div class="template-list" id="templateList" aria-label="模板列表"></div>
-
           <div class="control-grid">
             <label>
               预览宽度
