@@ -1,32 +1,33 @@
 # 发布到 GitHub Pages
 
-这个文件夹已经可以作为一个独立 GitHub Pages 项目发布。
+这个文件夹已经可以作为一个独立 GitHub Pages 项目发布。推荐使用 `Deploy from a branch`，因为这是纯静态网页，不需要 GitHub Actions 构建。
 
-## 方法一：命令行发布
+## 发布设置
 
-在 GitHub 新建一个空仓库，例如 `wechat-markdown-preview`。然后在本目录运行：
-
-```powershell
-git remote add origin https://github.com/你的用户名/wechat-markdown-preview.git
-git push -u origin main
-```
-
-推送后，到 GitHub 仓库页面：
+推送代码后，到 GitHub 仓库页面：
 
 1. 打开 `Settings`
 2. 进入 `Pages`
-3. 在 `Build and deployment` 中选择 `GitHub Actions`
-4. 等待 `Actions` 里的部署任务完成
+3. 在 `Build and deployment` 中：
+   - `Source` 选择 `Deploy from a branch`
+   - `Branch` 选择 `main`
+   - 文件夹选择 `/ (root)`
+4. 点击 `Save`
 
-发布地址通常是：
+等待 1-3 分钟后，发布地址通常是：
 
 ```text
 https://你的用户名.github.io/wechat-markdown-preview/
 ```
 
-## 方法二：网页上传
+## 命令行推送
 
-如果不想用命令行，可以在 GitHub 新建仓库后，把本文件夹里的所有文件上传到仓库根目录。注意也要上传隐藏目录 `.github` 和文件 `.nojekyll`。
+如果还没有推送远程仓库，可以运行：
+
+```powershell
+git remote add origin https://github.com/你的用户名/wechat-markdown-preview.git
+git push -u origin main
+```
 
 ## 后续更新
 
