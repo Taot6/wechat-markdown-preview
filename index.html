@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Markdown 公众号模板预览器</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <aside class="editor-panel" aria-label="Markdown 编辑区">
+          <div class="panel-head">
+            <div>
+              <h1>公众号排版预览器</h1>
+              <p>Markdown 转为可复制的公众号样式 HTML</p>
+            </div>
+            <button class="icon-button" id="loadSample" type="button" title="载入示例">示例</button>
+          </div>
+
+          <div class="toolbar">
+            <label class="file-button">
+              导入 .md
+              <input id="fileInput" type="file" accept=".md,.markdown,.txt" />
+            </label>
+            <button id="copyMarkdown" type="button">复制 Markdown</button>
+            <button id="insertImageScroll" type="button">插入滑动图片</button>
+            <button id="insertLinkScroll" type="button">插入滑动链接</button>
+            <button id="insertImageVScroll" type="button">插入上下图片</button>
+            <button id="insertLinkVScroll" type="button">插入上下链接</button>
+            <button id="clearEditor" type="button">清空</button>
+          </div>
+
+          <textarea id="markdownInput" spellcheck="false" aria-label="输入 Markdown"></textarea>
+        </aside>
+
+        <section class="control-panel" aria-label="模板控制区">
+          <div class="control-group">
+            <label for="templateSelect">模板</label>
+            <select id="templateSelect"></select>
+          </div>
+
+          <div class="template-list" id="templateList" aria-label="模板列表"></div>
+
+          <div class="control-grid">
+            <label>
+              预览宽度
+              <select id="previewWidth">
+                <option value="phone">手机</option>
+                <option value="wide">宽屏</option>
+              </select>
+            </label>
+            <label>
+              正文字号
+              <input id="fontSize" type="number" min="14" max="19" value="16" />
+            </label>
+            <label>
+              强调色
+              <input id="accentColor" type="color" value="#1b6fd8" />
+            </label>
+            <label>
+              背景色
+              <input id="paperColor" type="color" value="#ffffff" />
+            </label>
+          </div>
+
+          <div class="color-editor" id="colorEditor" aria-label="模板全部颜色"></div>
+
+          <div class="stats" id="stats"></div>
+
+          <div class="action-grid">
+            <button id="copyRich" type="button">复制到公众号</button>
+            <button id="copyHtml" type="button">复制 HTML</button>
+            <button id="downloadHtml" type="button">导出 HTML</button>
+            <button id="downloadMd" type="button">导出 Markdown</button>
+          </div>
+
+          <details class="html-box">
+            <summary>查看生成的 HTML</summary>
+            <textarea id="htmlOutput" readonly aria-label="生成的 HTML"></textarea>
+          </details>
+        </section>
+
+        <section class="preview-panel" aria-label="公众号文章预览区">
+          <div class="preview-head">
+            <div>
+              <strong id="previewTitle">实时预览</strong>
+              <span id="templateName"></span>
+            </div>
+            <span class="status" id="statusText">已同步</span>
+          </div>
+          <div class="preview-scroll">
+            <article class="wechat-preview phone" id="preview"></article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
