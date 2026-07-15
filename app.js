@@ -212,7 +212,16 @@ const els = {
 };
 
 const componentColors = ["#dbe4ef", "#5f6b7a", "#fbfcfe", "#e5eaf0", "#ffffff"];
+const paletteGroups = [
+  { id: "sunset-peak", name: "日照金山", colors: ["#d8c868", "#c8a838", "#a08098", "#685878", "#b87010", "#282838"] },
+  { id: "snow-violet", name: "雪山雾紫", colors: ["#c8a8b0", "#a898c0", "#9888b8", "#8880b8", "#88a8d0", "#80a0c8"] },
+  { id: "window-light", name: "窗边晨光", colors: ["#d8e0d8", "#a8c0c8", "#c8c880", "#d8a810", "#b0a860", "#805850"] },
+  { id: "rose-mountain", name: "暮色玫瑰", colors: ["#f4b48e", "#eda096", "#b1616c", "#877899", "#8f5c7d", "#593c5b"] },
+  { id: "green-field", name: "青绿原野", colors: ["#90c0b0", "#90b860", "#589860", "#387840", "#207058", "#104028"] },
+  { id: "winter-river", name: "冬日河岸", colors: ["#c8d0c0", "#98b8c0", "#98b8b8", "#80b0b8", "#6098a8", "#385050"] }
+];
 const colorOverrides = {};
+const activePaletteByTemplate = {};
 
 function escapeHtml(value) {
   return value
@@ -254,6 +263,14 @@ function applyVars(style, template) {
   return applyColorOverrides(resolved, template);
 }
 
+function colorLuminance(color) {
+  const value = normalizeColor(color).replace("#", "");
+  const r = parseInt(value.slice(0, 2), 16);
+  const g = parseInt(value.slice(2, 4), 16);
+  const b = parseInt(value.slice(4, 6), 16);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
 function collectTemplateColors(template) {
   const colors = new Set([template.accent, template.paper, ...componentColors].map(normalizeColor));
   Object.values(template).forEach((value) => {
@@ -264,19 +281,53 @@ function collectTemplateColors(template) {
   return [...colors].filter(Boolean);
 }
 
+function getPalette(id) {
+  return paletteGroups.find((palette) => palette.id === id) || paletteGroups[0];
+}
+
+function mapColorToPaletteSlot(color, template, palette) {
+  const normalized = normalizeColor(color);
+  if (normalized === normalizeColor(template.paper)) return palette.colors[0];
+  if (normalized === normalizeColor(template.accent)) return palette.colors[4];
+  const luminance = colorLuminance(normalized);
+  if (luminance >= 235) return palette.colors[0];
+  if (luminance >= 205) return palette.colors[1];
+  if (luminance >= 165) return palette.colors[2];
+  if (luminance >= 120) return palette.colors[3];
+  if (luminance >= 75) return palette.colors[4];
+  return palette.colors[5];
+}
+
+function applyPalette(template, paletteId) {
+  const palette = getPalette(paletteId);
+  const overrides = {};
+  collectTemplateColors(template).forEach((color) => {
+    overrides[color] = mapColorToPaletteSlot(color, template, palette);
+  });
+  colorOverrides[template.id] = overrides;
+  activePaletteByTemplate[template.id] = palette.id;
+}
+
 function renderColorEditor(template) {
-  const colors = collectTemplateColors(template);
-  const inputs = colors
-    .map((color, index) => {
-      const value = getColor(template, color);
-      const label = color === normalizeColor(template.accent) ? "强调色" : color === normalizeColor(template.paper) ? "背景色" : `颜色 ${index + 1}`;
-      return `<label class="color-item" title="${label}: ${color}">
-        <input type="color" value="${value}" data-color-original="${color}" aria-label="${label}" />
-        <span>${label}<br />${color}</span>
-      </label>`;
+  const activePalette = activePaletteByTemplate[template.id] || "";
+  const cards = paletteGroups
+    .map((palette, paletteIndex) => {
+      const swatches = palette.colors
+        .map((color, colorIndex) => `<label class="palette-swatch" title="${palette.name} 色 ${colorIndex + 1}: ${color}">
+          <input type="color" value="${color}" data-palette-id="${palette.id}" data-palette-index="${colorIndex}" aria-label="${palette.name} 色 ${colorIndex + 1}" />
+          <span>${color.toUpperCase()}</span>
+        </label>`)
+        .join("");
+      return `<section class="palette-card ${activePalette === palette.id ? "active" : ""}" data-palette-card="${palette.id}">
+        <div class="palette-card-head">
+          <strong>${paletteIndex + 1}. ${palette.name}</strong>
+          <button type="button" data-apply-palette="${palette.id}">应用</button>
+        </div>
+        <div class="palette-swatches">${swatches}</div>
+      </section>`;
     })
     .join("");
-  els.colorEditor.innerHTML = `<div class="color-editor-head"><strong>模板全部颜色</strong><button type="button" id="resetColors">重置</button></div><div class="color-grid">${inputs}</div>`;
+  els.colorEditor.innerHTML = `<div class="color-editor-head"><strong>模板全部颜色：6 组配套色</strong><button type="button" id="resetColors">重置</button></div><div class="palette-grid">${cards}</div>`;
   els.accentColor.value = getColor(template, template.accent);
   els.paperColor.value = getColor(template, template.paper);
 }
@@ -606,18 +657,31 @@ function bindEvents() {
     update();
   });
   els.colorEditor.addEventListener("input", (event) => {
-    const input = event.target.closest("input[type='color'][data-color-original]");
+    const input = event.target.closest("input[type='color'][data-palette-id]");
     if (!input) return;
     const template = getTemplate();
-    getTemplateOverrides(template)[normalizeColor(input.dataset.colorOriginal)] = input.value;
+    const palette = getPalette(input.dataset.paletteId);
+    palette.colors[Number(input.dataset.paletteIndex)] = input.value;
+    if (activePaletteByTemplate[template.id] === palette.id) {
+      applyPalette(template, palette.id);
+    }
     update();
   });
   els.colorEditor.addEventListener("click", (event) => {
-    if (event.target.id !== "resetColors") return;
     const template = getTemplate();
-    colorOverrides[template.id] = {};
-    update();
-    setStatus("颜色已重置", true);
+    const applyButton = event.target.closest("[data-apply-palette]");
+    if (applyButton) {
+      applyPalette(template, applyButton.dataset.applyPalette);
+      update();
+      setStatus("已应用配套色", true);
+      return;
+    }
+    if (event.target.id === "resetColors") {
+      colorOverrides[template.id] = {};
+      delete activePaletteByTemplate[template.id];
+      update();
+      setStatus("颜色已重置", true);
+    }
   });
   els.previewWidth.addEventListener("change", () => {
     els.preview.classList.toggle("phone", els.previewWidth.value === "phone");

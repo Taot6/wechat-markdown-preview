@@ -276,6 +276,72 @@ input[type="color"] {
   font-size: 12px;
 }
 
+.palette-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.palette-card {
+  display: grid;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.palette-card.active {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.palette-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.palette-card-head strong {
+  font-size: 13px;
+}
+
+.palette-card-head button {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.palette-swatches {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(24px, 1fr));
+  gap: 6px;
+}
+
+.palette-swatch {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.palette-swatch input[type="color"] {
+  width: 100%;
+  height: 54px;
+  padding: 2px;
+  border-radius: 999px;
+}
+
+.palette-swatch span {
+  overflow: hidden;
+  color: var(--muted);
+  font-family: Consolas, "SFMono-Regular", monospace;
+  font-size: 10px;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .color-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
