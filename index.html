@@ -37,6 +37,8 @@
             <button id="insertLinkScroll" type="button">插入滑动链接</button>
             <button id="insertImageVScroll" type="button">插入上下图片</button>
             <button id="insertLinkVScroll" type="button">插入上下链接</button>
+            <button id="insertPaperCard" type="button">插入文献卡片</button>
+            <button id="insertHighlightBox" type="button">插入重点框</button>
             <button id="clearEditor" type="button">清空</button>
           </div>
 
@@ -69,6 +71,26 @@
           <div class="color-editor" id="colorEditor" aria-label="模板全部颜色"></div>
 
           <div class="stats" id="stats"></div>
+
+          <section class="cover-tool" aria-label="封面图生成器">
+            <div class="cover-tool-head">
+              <strong>封面图生成器</strong>
+              <button id="syncCoverTitle" type="button">取标题</button>
+            </div>
+            <label>
+              封面标题
+              <input id="coverTitle" type="text" value="今日高分生信文献精选" />
+            </label>
+            <label>
+              副标题
+              <input id="coverSubtitle" type="text" value="Bioinformatics Research Digest" />
+            </label>
+            <canvas id="coverCanvas" width="900" height="383" aria-label="封面图预览"></canvas>
+            <div class="cover-actions">
+              <button id="generateCover" type="button">生成封面</button>
+              <button id="downloadCover" type="button">下载 PNG</button>
+            </div>
+          </section>
 
           <div class="action-grid">
             <button id="copyRich" type="button">复制到公众号</button>

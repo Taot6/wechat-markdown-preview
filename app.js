@@ -208,17 +208,20 @@ const els = {
   stats: document.getElementById("stats"),
   status: document.getElementById("statusText"),
   templateName: document.getElementById("templateName"),
-  fileInput: document.getElementById("fileInput")
+  fileInput: document.getElementById("fileInput"),
+  coverTitle: document.getElementById("coverTitle"),
+  coverSubtitle: document.getElementById("coverSubtitle"),
+  coverCanvas: document.getElementById("coverCanvas")
 };
 
 const componentColors = ["#dbe4ef", "#5f6b7a", "#fbfcfe", "#e5eaf0", "#ffffff"];
 const paletteGroups = [
-  { id: "academic-blue", name: "学术蓝", colors: ["#f7fafc", "#e6f0fa", "#9bbce0", "#3f7fbf", "#1f5f99", "#163b5c"] },
-  { id: "clinical-green", name: "临床绿", colors: ["#f8fbf9", "#e4f2ec", "#a8d5c2", "#49a078", "#14745f", "#0d3f35"] },
-  { id: "single-cell-purple", name: "单细胞紫", colors: ["#fbf9ff", "#eee8ff", "#c7b7f2", "#8b6fd6", "#6546b8", "#2f245c"] },
-  { id: "journal-red", name: "高分期刊红", colors: ["#fff8f6", "#fbe7e1", "#f2aaa0", "#d95f4f", "#a93226", "#4a1f1a"] },
-  { id: "method-teal", name: "方法工具青", colors: ["#f7fcfc", "#e1f3f2", "#9dd8d4", "#38a3a5", "#0f766e", "#123d42"] },
-  { id: "warm-gold", name: "暖金重点", colors: ["#fffdf5", "#f7efd0", "#e6cc72", "#c59b26", "#7a5a12", "#33280f"] }
+  { id: "sunset-peak", name: "日照金山", colors: ["#d8c868", "#c8a838", "#a08098", "#685878", "#b87010", "#282838"] },
+  { id: "snow-violet", name: "雪山雾紫", colors: ["#c8a8b0", "#a898c0", "#9888b8", "#8880b8", "#88a8d0", "#80a0c8"] },
+  { id: "window-light", name: "窗边晨光", colors: ["#d8e0d8", "#a8c0c8", "#c8c880", "#d8a810", "#b0a860", "#805850"] },
+  { id: "rose-mountain", name: "暮色玫瑰", colors: ["#f4b48e", "#eda096", "#b1616c", "#877899", "#8f5c7d", "#593c5b"] },
+  { id: "green-field", name: "青绿原野", colors: ["#90c0b0", "#90b860", "#589860", "#387840", "#207058", "#104028"] },
+  { id: "winter-river", name: "冬日河岸", colors: ["#c8d0c0", "#98b8c0", "#98b8b8", "#80b0b8", "#6098a8", "#385050"] }
 ];
 const colorOverrides = {};
 const activePaletteByTemplate = {};
@@ -416,11 +419,61 @@ function renderLinkVScroll(lines, template) {
   return `<section style="margin: 16px 0; max-height: 340px; padding: 12px 12px 2px; overflow-y: auto; -webkit-overflow-scrolling: touch; border: 1px solid #dbe4ef; border-radius: 6px; background: #fbfcfe;">${items.join("")}</section>`;
 }
 
+function parseKeyValueBlock(lines) {
+  const data = {};
+  const rest = [];
+  lines.forEach((line) => {
+    const match = line.match(/^\s*([^:：]+)\s*[:：]\s*(.+)\s*$/);
+    if (match) {
+      data[match[1].trim()] = match[2].trim();
+    } else if (line.trim()) {
+      rest.push(line.trim());
+    }
+  });
+  return { data, rest };
+}
+
+function renderPaperCard(lines, template) {
+  const { data, rest } = parseKeyValueBlock(lines);
+  const title = data["标题"] || data["Title"] || "文献标题";
+  const journal = data["期刊"] || data["Journal"] || "期刊";
+  const date = data["日期"] || data["Date"] || "";
+  const doi = data["DOI"] || data["doi"] || "";
+  const highlight = data["亮点"] || data["Highlight"] || rest.join(" ");
+  const method = data["方法"] || data["Method"] || "";
+  const insight = data["启发"] || data["Insight"] || "";
+  const meta = [journal, date].filter(Boolean).join(" · ");
+  const doiHtml = doi ? `<a href="${doi.startsWith("http") ? escapeHtml(doi) : `https://doi.org/${escapeHtml(doi)}`}" style="color: ${template.accent}; text-decoration: none; border-bottom: 1px solid ${template.accent};">DOI / 原文链接</a>` : "";
+  const rows = [
+    highlight ? `<p style="margin: 10px 0 0; color: #374151; font-size: 14px; line-height: 1.75;"><strong style="color: ${template.accent};">亮点：</strong>${inlineMarkdown(highlight, template)}</p>` : "",
+    method ? `<p style="margin: 8px 0 0; color: #405066; font-size: 14px; line-height: 1.75;"><strong style="color: ${template.accent};">方法：</strong>${inlineMarkdown(method, template)}</p>` : "",
+    insight ? `<p style="margin: 8px 0 0; color: #405066; font-size: 14px; line-height: 1.75;"><strong style="color: ${template.accent};">启发：</strong>${inlineMarkdown(insight, template)}</p>` : ""
+  ].join("");
+  return `<section style="margin: 18px 0; padding: 14px 15px; border: 1px solid #dbe4ef; border-left: 5px solid ${template.accent}; border-radius: 6px; background: #ffffff;">
+    <p style="margin: 0 0 8px; color: ${template.accent}; font-size: 13px; line-height: 1.5; font-weight: 700;">文献卡片</p>
+    <h3 style="margin: 0; color: #10233f; font-size: 17px; line-height: 1.5; font-weight: 760;">${inlineMarkdown(title, template)}</h3>
+    <p style="margin: 8px 0 0; color: #5f6b7a; font-size: 13px; line-height: 1.6;">${inlineMarkdown(meta || "期刊信息", template)}${doiHtml ? ` · ${doiHtml}` : ""}</p>
+    ${rows}
+  </section>`;
+}
+
+function renderHighlightBox(lines, template) {
+  const { data, rest } = parseKeyValueBlock(lines);
+  const type = data["类型"] || data["标题"] || "核心重点";
+  const content = data["内容"] || rest.join("<br />") || "在这里写入需要突出的重点内容。";
+  return `<section style="margin: 18px 0; padding: 13px 14px; border: 1px solid #dbe4ef; border-radius: 6px; background: #fbfcfe;">
+    <p style="margin: 0 0 8px; padding-left: 10px; border-left: 4px solid ${template.accent}; color: ${template.accent}; font-size: 15px; line-height: 1.5; font-weight: 760;">${inlineMarkdown(type, template)}</p>
+    <p style="margin: 0; color: #374151; font-size: ${els.fontSize.value || "16"}px; line-height: 1.85;">${inlineMarkdown(content, template)}</p>
+  </section>`;
+}
+
 function renderCustomBlock(kind, lines, template) {
   if (kind === "image-scroll") return renderImageScroll(lines, template);
   if (kind === "link-scroll") return renderLinkScroll(lines, template);
   if (kind === "image-vscroll") return renderImageVScroll(lines, template);
   if (kind === "link-vscroll") return renderLinkVScroll(lines, template);
+  if (kind === "paper-card") return renderPaperCard(lines, template);
+  if (kind === "highlight") return renderHighlightBox(lines, template);
   return "";
 }
 
@@ -447,7 +500,7 @@ function parseMarkdown(markdown, template) {
       continue;
     }
 
-    const customBlock = trimmed.match(/^:::\s*(image-scroll|link-scroll|image-vscroll|link-vscroll)\s*$/);
+    const customBlock = trimmed.match(/^:::\s*(image-scroll|link-scroll|image-vscroll|link-vscroll|paper-card|highlight)\s*$/);
     if (customBlock) {
       flushParagraph(paragraph, html, template);
       const blockLines = [];
@@ -589,6 +642,7 @@ function update() {
     `表格数量：<strong>${stats.tables}</strong>`,
     `预计阅读：<strong>${stats.minutes} 分钟</strong>`
   ].join("");
+  generateCover();
 }
 
 async function copyText(text, successText) {
@@ -632,6 +686,83 @@ function todayName(ext) {
   const now = new Date();
   const pad = (value) => String(value).padStart(2, "0");
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}_公众号排版预览.${ext}`;
+}
+
+function getArticleTitle() {
+  const match = els.input.value.match(/^#\s+(.+)$/m);
+  return match ? match[1].trim() : "今日高分生信文献精选";
+}
+
+function wrapCanvasText(ctx, text, maxWidth, maxLines) {
+  const chars = String(text || "").split("");
+  const lines = [];
+  let line = "";
+  chars.forEach((char) => {
+    const test = line + char;
+    if (ctx.measureText(test).width > maxWidth && line) {
+      lines.push(line);
+      line = char;
+    } else {
+      line = test;
+    }
+  });
+  if (line) lines.push(line);
+  if (lines.length > maxLines) {
+    lines.length = maxLines;
+    while (ctx.measureText(`${lines[maxLines - 1]}...`).width > maxWidth && lines[maxLines - 1].length > 1) {
+      lines[maxLines - 1] = lines[maxLines - 1].slice(0, -1);
+    }
+    lines[maxLines - 1] = `${lines[maxLines - 1]}...`;
+  }
+  return lines;
+}
+
+function generateCover() {
+  const canvas = els.coverCanvas;
+  const ctx = canvas.getContext("2d");
+  const template = getTemplate();
+  const accent = getColor(template, template.accent);
+  const dark = getColor(template, "#10233f");
+  const muted = getColor(template, "#5f6b7a");
+  const title = els.coverTitle.value.trim() || getArticleTitle();
+  const subtitle = els.coverSubtitle.value.trim() || "Bioinformatics Research Digest";
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = getColor(template, "#fbfcfe");
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = accent;
+  ctx.fillRect(0, 0, 18, canvas.height);
+  ctx.globalAlpha = 0.12;
+  ctx.fillStyle = accent;
+  ctx.beginPath();
+  ctx.arc(790, 40, 180, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(760, 350, 130, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = accent;
+  ctx.font = "700 28px Microsoft YaHei, Arial";
+  ctx.fillText("公众号文章封面", 70, 74);
+
+  ctx.fillStyle = dark;
+  ctx.font = "800 54px Microsoft YaHei, Arial";
+  const titleLines = wrapCanvasText(ctx, title, 680, 2);
+  titleLines.forEach((line, index) => ctx.fillText(line, 70, 158 + index * 66));
+
+  ctx.fillStyle = muted;
+  ctx.font = "400 25px Microsoft YaHei, Arial";
+  wrapCanvasText(ctx, subtitle, 700, 2).forEach((line, index) => ctx.fillText(line, 72, 304 + index * 34));
+
+  ctx.fillStyle = accent;
+  ctx.fillRect(70, 340, 150, 8);
+  ctx.fillStyle = muted;
+  ctx.font = "400 18px Arial";
+  ctx.fillText("Markdown to WeChat", 650, 346);
 }
 
 function bindEvents() {
@@ -734,6 +865,51 @@ function bindEvents() {
 `);
     setStatus("已插入上下链接", true);
   });
+  document.getElementById("insertPaperCard").addEventListener("click", () => {
+    insertAtCursor(`::: paper-card
+标题: 这里填写文献标题
+期刊: Nature Medicine
+日期: 2026-07-15
+DOI: 10.0000/example
+亮点: 一句话概括这篇文章最值得公众号读者关注的发现。
+方法: 单细胞转录组、空间验证、公共队列映射、预后分析。
+启发: 可借鉴其“细胞状态定义 - 队列验证 - 临床解释”的分析闭环。
+:::
+`);
+    setStatus("已插入文献卡片", true);
+  });
+  document.getElementById("insertHighlightBox").addEventListener("click", () => {
+    insertAtCursor(`::: highlight
+类型: 核心结论
+内容: 这里写需要读者优先记住的关键发现、分析思路或选题启发。
+:::
+`);
+    setStatus("已插入重点框", true);
+  });
+  document.getElementById("syncCoverTitle").addEventListener("click", () => {
+    els.coverTitle.value = getArticleTitle();
+    generateCover();
+    setStatus("已读取标题", true);
+  });
+  document.getElementById("generateCover").addEventListener("click", () => {
+    generateCover();
+    setStatus("已生成封面", true);
+  });
+  document.getElementById("downloadCover").addEventListener("click", () => {
+    els.coverCanvas.toBlob((blob) => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = todayName("png").replace("公众号排版预览", "公众号封面图");
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setStatus("已下载封面", true);
+    }, "image/png");
+  });
+  [els.coverTitle, els.coverSubtitle].forEach((input) => input.addEventListener("input", generateCover));
   document.getElementById("copyHtml").addEventListener("click", () => copyText(els.htmlOutput.value, "已复制 HTML"));
   document.getElementById("copyRich").addEventListener("click", copyRichHtml);
   document.getElementById("downloadHtml").addEventListener("click", () => {

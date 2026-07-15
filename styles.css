@@ -389,6 +389,60 @@ input[type="color"] {
   line-height: 1.45;
 }
 
+.cover-tool {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.cover-tool-head,
+.cover-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cover-tool-head strong {
+  font-size: 13px;
+}
+
+.cover-tool-head button,
+.cover-actions button {
+  min-height: 30px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.cover-tool label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.cover-tool input[type="text"] {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ink);
+}
+
+#coverCanvas {
+  width: 100%;
+  aspect-ratio: 900 / 383;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+}
+
 .action-grid button:first-child {
   grid-column: 1 / -1;
   color: #fff;
