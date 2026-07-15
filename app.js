@@ -287,10 +287,10 @@ function getPalette(id) {
 
 function mapColorToPaletteSlot(color, template, palette) {
   const normalized = normalizeColor(color);
-  if (normalized === normalizeColor(template.paper)) return palette.colors[0];
+  if (normalized === normalizeColor(template.paper)) return "#ffffff";
   if (normalized === normalizeColor(template.accent)) return palette.colors[4];
   const luminance = colorLuminance(normalized);
-  if (luminance >= 235) return palette.colors[0];
+  if (luminance >= 235) return "#ffffff";
   if (luminance >= 205) return palette.colors[1];
   if (luminance >= 165) return palette.colors[2];
   if (luminance >= 120) return palette.colors[3];
