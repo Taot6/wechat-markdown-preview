@@ -435,6 +435,16 @@ input[type="color"] {
   color: var(--ink);
 }
 
+.cover-color-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cover-color-grid input[type="color"] {
+  height: 34px;
+}
+
 #coverCanvas {
   width: 100%;
   aspect-ratio: 900 / 383;
@@ -558,7 +568,8 @@ input[type="color"] {
   }
 
   .control-grid,
-  .action-grid {
+  .action-grid,
+  .cover-color-grid {
     grid-template-columns: 1fr;
   }
 

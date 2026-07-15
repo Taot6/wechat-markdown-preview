@@ -85,8 +85,23 @@
               副标题
               <input id="coverSubtitle" type="text" value="Bioinformatics Research Digest" />
             </label>
+            <div class="cover-color-grid">
+              <label>
+                背景
+                <input id="coverBgColor" type="color" value="#fbfcfe" />
+              </label>
+              <label>
+                主色
+                <input id="coverAccentColor" type="color" value="#1b6fd8" />
+              </label>
+              <label>
+                文字
+                <input id="coverTextColor" type="color" value="#10233f" />
+              </label>
+            </div>
             <canvas id="coverCanvas" width="900" height="383" aria-label="封面图预览"></canvas>
             <div class="cover-actions">
+              <button id="syncCoverColors" type="button">同步模板色</button>
               <button id="generateCover" type="button">生成封面</button>
               <button id="downloadCover" type="button">下载 PNG</button>
             </div>

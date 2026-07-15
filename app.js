@@ -211,6 +211,9 @@ const els = {
   fileInput: document.getElementById("fileInput"),
   coverTitle: document.getElementById("coverTitle"),
   coverSubtitle: document.getElementById("coverSubtitle"),
+  coverBgColor: document.getElementById("coverBgColor"),
+  coverAccentColor: document.getElementById("coverAccentColor"),
+  coverTextColor: document.getElementById("coverTextColor"),
   coverCanvas: document.getElementById("coverCanvas")
 };
 
@@ -225,6 +228,7 @@ const paletteGroups = [
 ];
 const colorOverrides = {};
 const activePaletteByTemplate = {};
+let coverColorsLocked = false;
 
 function escapeHtml(value) {
   return value
@@ -717,12 +721,21 @@ function wrapCanvasText(ctx, text, maxWidth, maxLines) {
   return lines;
 }
 
+function syncCoverColorsFromTemplate() {
+  const template = getTemplate();
+  els.coverBgColor.value = getColor(template, "#fbfcfe");
+  els.coverAccentColor.value = getColor(template, template.accent);
+  els.coverTextColor.value = getColor(template, "#10233f");
+}
+
 function generateCover() {
   const canvas = els.coverCanvas;
   const ctx = canvas.getContext("2d");
   const template = getTemplate();
-  const accent = getColor(template, template.accent);
-  const dark = getColor(template, "#10233f");
+  if (!coverColorsLocked) syncCoverColorsFromTemplate();
+  const bg = els.coverBgColor.value;
+  const accent = els.coverAccentColor.value;
+  const dark = els.coverTextColor.value;
   const muted = getColor(template, "#5f6b7a");
   const title = els.coverTitle.value.trim() || getArticleTitle();
   const subtitle = els.coverSubtitle.value.trim() || "Bioinformatics Research Digest";
@@ -730,7 +743,7 @@ function generateCover() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = getColor(template, "#fbfcfe");
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = accent;
@@ -891,6 +904,12 @@ DOI: 10.0000/example
     generateCover();
     setStatus("已读取标题", true);
   });
+  document.getElementById("syncCoverColors").addEventListener("click", () => {
+    coverColorsLocked = false;
+    syncCoverColorsFromTemplate();
+    generateCover();
+    setStatus("已同步封面颜色", true);
+  });
   document.getElementById("generateCover").addEventListener("click", () => {
     generateCover();
     setStatus("已生成封面", true);
@@ -910,6 +929,12 @@ DOI: 10.0000/example
     }, "image/png");
   });
   [els.coverTitle, els.coverSubtitle].forEach((input) => input.addEventListener("input", generateCover));
+  [els.coverBgColor, els.coverAccentColor, els.coverTextColor].forEach((input) => {
+    input.addEventListener("input", () => {
+      coverColorsLocked = true;
+      generateCover();
+    });
+  });
   document.getElementById("copyHtml").addEventListener("click", () => copyText(els.htmlOutput.value, "已复制 HTML"));
   document.getElementById("copyRich").addEventListener("click", copyRichHtml);
   document.getElementById("downloadHtml").addEventListener("click", () => {
