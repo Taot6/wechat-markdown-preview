@@ -213,12 +213,12 @@ const els = {
 
 const componentColors = ["#dbe4ef", "#5f6b7a", "#fbfcfe", "#e5eaf0", "#ffffff"];
 const paletteGroups = [
-  { id: "sunset-peak", name: "日照金山", colors: ["#d8c868", "#c8a838", "#a08098", "#685878", "#b87010", "#282838"] },
-  { id: "snow-violet", name: "雪山雾紫", colors: ["#c8a8b0", "#a898c0", "#9888b8", "#8880b8", "#88a8d0", "#80a0c8"] },
-  { id: "window-light", name: "窗边晨光", colors: ["#d8e0d8", "#a8c0c8", "#c8c880", "#d8a810", "#b0a860", "#805850"] },
-  { id: "rose-mountain", name: "暮色玫瑰", colors: ["#f4b48e", "#eda096", "#b1616c", "#877899", "#8f5c7d", "#593c5b"] },
-  { id: "green-field", name: "青绿原野", colors: ["#90c0b0", "#90b860", "#589860", "#387840", "#207058", "#104028"] },
-  { id: "winter-river", name: "冬日河岸", colors: ["#c8d0c0", "#98b8c0", "#98b8b8", "#80b0b8", "#6098a8", "#385050"] }
+  { id: "academic-blue", name: "学术蓝", colors: ["#f7fafc", "#e6f0fa", "#9bbce0", "#3f7fbf", "#1f5f99", "#163b5c"] },
+  { id: "clinical-green", name: "临床绿", colors: ["#f8fbf9", "#e4f2ec", "#a8d5c2", "#49a078", "#14745f", "#0d3f35"] },
+  { id: "single-cell-purple", name: "单细胞紫", colors: ["#fbf9ff", "#eee8ff", "#c7b7f2", "#8b6fd6", "#6546b8", "#2f245c"] },
+  { id: "journal-red", name: "高分期刊红", colors: ["#fff8f6", "#fbe7e1", "#f2aaa0", "#d95f4f", "#a93226", "#4a1f1a"] },
+  { id: "method-teal", name: "方法工具青", colors: ["#f7fcfc", "#e1f3f2", "#9dd8d4", "#38a3a5", "#0f766e", "#123d42"] },
+  { id: "warm-gold", name: "暖金重点", colors: ["#fffdf5", "#f7efd0", "#e6cc72", "#c59b26", "#7a5a12", "#33280f"] }
 ];
 const colorOverrides = {};
 const activePaletteByTemplate = {};
